@@ -10,10 +10,10 @@ import scala.concurrent.ExecutionContext
 case class TraceExecuteContext(executionContext: ExecutionContext) extends ExecutionContext {
 
   override def execute(runnable: Runnable): Unit = {
-    val ct = ThreadContextUtil.getContext
+    val ct = Option(ThreadContextUtil.getContext)
     executionContext.execute(new Runnable {
       def run(): Unit = {
-        ThreadContextUtil.copyContext(ct.copy(tid = Thread.currentThread().getId.toString))
+        ct.foreach(source => ThreadContextUtil.copyContext(source.copy(tid = Thread.currentThread().getId.toString)))
         runnable.run()
       }
     })
@@ -21,4 +21,8 @@ case class TraceExecuteContext(executionContext: ExecutionContext) extends Execu
 
   override def reportFailure(cause: Throwable): Unit = executionContext.reportFailure(cause)
 
+}
+
+object TraceExecuteContext {
+  implicit val traceExecuteContext = TraceExecuteContext(ExecutionContext.fromExecutor(null))
 }
