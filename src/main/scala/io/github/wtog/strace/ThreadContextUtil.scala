@@ -9,7 +9,7 @@ import java.util.UUID
   */
 object ThreadContextUtil {
 
-  private[this] val currentThread = new ThreadLocal[ThreadContext]()
+  val currentThread = new ThreadLocal[ThreadContext]()
 
   private[this] def sourceId = UUID.randomUUID().toString.replace("-", "")
 
@@ -20,7 +20,7 @@ object ThreadContextUtil {
 
   def copyContext(threadContext: ThreadContext) = this.currentThread.set(threadContext)
 
-  def getContext = currentThread.get()
+  def getContext = Option(currentThread.get())
 
   def cleanContext() = currentThread.remove()
 }

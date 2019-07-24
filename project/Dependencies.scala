@@ -19,9 +19,17 @@ object Dependencies {
     "org.apache.logging.log4j" % "log4j-api" % log4j2 % Provided,
     "org.apache.logging.log4j" % "log4j-core" % log4j2 % Provided)
 
+  lazy val typesafe = Seq(
+    "com.typesafe" % "config" % "1.3.3" % Provided
+  )
+ 
+  lazy val akka = Seq(
+    "com.typesafe.akka" %% "akka-actor" % "2.5.1" % Provided  
+  )
+  
   lazy val test = Seq("org.scalatest" %% "scalatest" % "3.0.8" % Test)
 
   val crossVersion = Seq("2.12.8", "2.11.12")
 
-  lazy val dependencies = log ++ test
+  lazy val dependencies = (log ++ test ++ typesafe ++ akka)
 }

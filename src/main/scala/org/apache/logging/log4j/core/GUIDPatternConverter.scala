@@ -15,9 +15,8 @@ import org.apache.logging.log4j.core.pattern.{ ConverterKeys, LogEventPatternCon
 @ConverterKeys(value = Array[String]("G"))
 class GUIDPatternConverter(name: String, style: String) extends LogEventPatternConverter(name, style) {
 
-  override def format(event: LogEvent, builder: lang.StringBuilder): Unit = {
-   Option(ThreadContextUtil.getContext).foreach(context => builder.append(context.guid))
-  }
+  override def format(event: LogEvent, builder: lang.StringBuilder): Unit =
+    ThreadContextUtil.getContext.foreach(context => builder.append(s"GUID[${context.guid}]"))
 }
 
 object GUIDPatternConverter {

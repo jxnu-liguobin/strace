@@ -7,7 +7,9 @@ import io.github.wtog.strace.ThreadContextUtil
 import io.github.wtog.strace.TraceExecuteContext._
 import org.scalatest.FunSuite
 
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
+import scala.util.Random
 
 /**
   * @author : tong.wang
@@ -16,24 +18,50 @@ import scala.concurrent.Future
   */
 class TraceTest extends FunSuite with LazyLogging {
 
-  def m1(): Unit = {
+  def m1(group: Int): ListBuffer[String] = {
     ThreadContextUtil()
 
-    logger.info(s"hh")
+    log(s"$group hh")
 
+    val buffer = new ListBuffer[String]
+    val pt = ThreadContextUtil.getContext.get.guid
+    buffer.append(pt)
     Future {
-      logger.info(s"f1")
+      log(s"$group f1")
 
+      val f1t = ThreadContextUtil.getContext.get.guid
+      buffer.append(f1t)
       Future {
-        logger.info(s"f2")
+        log(s"$group f2")
+        Thread.sleep(Random.nextInt(10))
+        val f2t = ThreadContextUtil.getContext.get.guid
+        buffer.append(f2t)
+      }
+    }.flatMap { _ =>
+      val f3t = ThreadContextUtil.getContext.get.guid
+      buffer.append(f3t)
+      Future {
+        val f4t = ThreadContextUtil.getContext.get.guid
+        buffer.append(f4t)
       }
     }
-
     TimeUnit.MILLISECONDS.sleep(500)
     ThreadContextUtil.cleanContext()
+    assert(buffer.toSet.size == 1)
+    buffer
   }
 
+  def log(msg: String) = logger.info(s"${msg} ${Thread.currentThread().getId}")
+
   test("log guid") {
-    m1()
+    (1 to 10) foreach { g =>
+      Future{
+        m1(g)
+      }(scala.concurrent.ExecutionContext.Implicits.global)
+      println()
+    }
+
+    TimeUnit.SECONDS.sleep(10)
   }
+
 }
