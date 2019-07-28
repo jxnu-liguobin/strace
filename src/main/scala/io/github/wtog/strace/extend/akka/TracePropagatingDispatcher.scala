@@ -1,4 +1,4 @@
-package io.github.wtog.strace.akka
+package io.github.wtog.strace.extend.akka
 
 import java.util.concurrent.TimeUnit
 
@@ -32,11 +32,11 @@ class TracePropagatingDispatcher(
 class TracePropagatingDispatcherConfigurator(config: Config, prerequisites: DispatcherPrerequisites) extends MessageDispatcherConfigurator(config, prerequisites) {
   val instance = new TracePropagatingDispatcher(
     this,
-    config.getString("id"),
-    config.getInt("throughput"),
-    config.getDuration("throughput-deadline-time", TimeUnit.NANOSECONDS).nanosecond,
-    configureExecutor(),
-    config.getDuration("shutdown-timeout", TimeUnit.MICROSECONDS).millisecond
+    id = config.getString("id"),
+    throughput = config.getInt("throughput"),
+    throughputDeadlineTime = config.getDuration("throughput-deadline-time", TimeUnit.NANOSECONDS).nanosecond,
+    executorServiceFactoryProvider = configureExecutor(),
+    shutdownTimeout = config.getDuration("shutdown-timeout", TimeUnit.MICROSECONDS).millisecond
   )
 
   override def dispatcher(): MessageDispatcher = instance

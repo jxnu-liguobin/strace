@@ -2,13 +2,14 @@ package io.github.wtog.strace.test
 
 import java.util.concurrent.TimeUnit
 
+import akka.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
-import io.github.wtog.strace.ThreadContextUtil
-import io.github.wtog.strace.TraceExecuteContext._
+import io.github.wtog.strace.extend.akka.TracePropagatingDispatcher
+import io.github.wtog.strace.{ThreadContextUtil, TraceExecuteContext}
 import org.scalatest.FunSuite
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 /**
@@ -18,7 +19,7 @@ import scala.util.Random
   */
 class TraceTest extends FunSuite with LazyLogging {
 
-  def m1(group: Int): ListBuffer[String] = {
+  def m1(group: Int)(implicit ec: ExecutionContext): ListBuffer[String] = {
     ThreadContextUtil()
 
     log(s"$group hh")
@@ -53,15 +54,23 @@ class TraceTest extends FunSuite with LazyLogging {
 
   def log(msg: String) = logger.info(s"${msg} ${Thread.currentThread().getId}")
 
-  test("log guid") {
-    (1 to 10) foreach { g =>
-      Future{
-        m1(g)
+  def execute(implicit ec: ExecutionContext) = {
+    (1 to 10) foreach { i =>
+      Future {
+        m1(i)
       }(scala.concurrent.ExecutionContext.Implicits.global)
-      println()
     }
-
-    TimeUnit.SECONDS.sleep(10)
+    TimeUnit.SECONDS.sleep(3)
   }
 
+  test("log guid") {
+    execute(TraceExecuteContext.traceExecuteContext)
+  }
+
+  test("custom execution context") {
+    val actor = ActorSystem("custom-execution-context")
+    implicit val customExecutionContext = actor.dispatchers.lookup("akka.actor.cpu-dispatcher")
+    assert(customExecutionContext.id == "akka.actor.cpu-dispatcher")
+    execute(customExecutionContext)
+  }
 }
