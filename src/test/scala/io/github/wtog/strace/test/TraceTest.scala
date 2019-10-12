@@ -4,10 +4,6 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
-<<<<<<< HEAD
-import io.github.wtog.strace.extend.akka.TracePropagatingDispatcher
-=======
->>>>>>> ae8c27bbf259b0d4238477d9e310ee4d82635702
 import io.github.wtog.strace.{ThreadContextUtil, TraceExecuteContext}
 import org.scalatest.FunSuite
 
