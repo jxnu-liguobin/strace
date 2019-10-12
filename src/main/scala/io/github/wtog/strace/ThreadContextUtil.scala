@@ -13,7 +13,7 @@ object ThreadContextUtil {
 
   private[this] def sourceId = UUID.randomUUID().toString.replace("-", "")
 
-  def apply(guid: Option[String] = None): Unit = {
+  def init(guid: Option[String] = None): Unit = {
     val ct = Thread.currentThread()
     currentThread.set(ThreadContext(guid.getOrElse(sourceId), String.valueOf(ct.getId)))
   }

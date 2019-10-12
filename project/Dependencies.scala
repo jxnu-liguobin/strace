@@ -14,7 +14,6 @@ object Dependencies {
   import Versions._
 
   lazy val log = Seq(
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0" % Provided,
     "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4j2 % Provided,
     "org.apache.logging.log4j" % "log4j-api" % log4j2 % Provided,
     "org.apache.logging.log4j" % "log4j-core" % log4j2 % Provided)
@@ -27,7 +26,9 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % "2.5.1" % Provided  
   )
   
-  lazy val test = Seq("org.scalatest" %% "scalatest" % "3.0.8" % Test)
+  lazy val test = Seq(
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0" % Test,
+    "org.scalatest" %% "scalatest" % "3.0.8" % Test)
 
   val crossVersion = Seq("2.12.8", "2.11.12")
 
